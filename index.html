@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fit Timer Pro v2.4 iOS Fix</title>
+  <title>Fit Timer Pro v2.5 Scroll Fix</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,42 +18,75 @@
       margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg); background-image: radial-gradient(circle at top right, #1e293b, var(--bg));
       color: var(--text); min-height: 100vh; transition: background-color 0.8s ease;
+      overflow-x: hidden;
     }
     body.phase-work { background-color: #061a14; background-image: radial-gradient(circle at top right, #064e3b, #061a14); }
     body.phase-rest { background-color: #0a1529; background-image: radial-gradient(circle at top right, #1e3a8a, #0a1529); }
-    .container { max-width: 500px; margin: 0 auto; padding: 24px 20px calc(60px + env(safe-area-inset-bottom)); }
+    
+    .container { max-width: 500px; margin: 0 auto; padding: 24px 20px calc(40px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; min-height: 100vh; }
+    
     header { margin-bottom: 32px; padding-top: 20px; }
     h1 { font-size: 34px; margin: 0; font-weight: 850; letter-spacing: -1px; }
     .subtitle { color: var(--muted); font-size: 15px; margin-top: 6px; }
+
     .list { display: flex; flex-direction: column; gap: 16px; }
     .card { background: var(--card); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 24px; }
     .card h3 { margin: 0 0 8px; font-size: 22px; color: #fff; }
     .card-info { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
     .btn { border: 0; border-radius: 18px; padding: 16px 24px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .btn-primary { background: white; color: black; width: 100%; }
     .btn-ghost { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
     .btn-icon { width: 56px; height: 56px; border-radius: 18px; }
-    .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+
+    .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .overall-progress { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.1); z-index: 100; }
     .progress-fill { height: 100%; background: var(--accent); transition: width 0.5s; width: 0%; }
-    .timer-display { position: relative; width: 260px; height: 260px; margin: 10px auto 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    .timer-display { position: relative; width: 240px; height: 240px; margin: 10px auto 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
     .svg-timer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
     .svg-timer circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
     .circle-bg { stroke: rgba(255,255,255,0.05); }
     .circle-prog { stroke: var(--accent); stroke-dasharray: 880; stroke-dashoffset: 0; }
-    .time-val { font-size: 72px; font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
-    .phase-txt { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: var(--muted); margin-bottom: -5px; }
-    .ex-title { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; line-height: 1.2; }
-    .ex-sub { font-size: 15px; color: var(--muted); text-align: center; margin-bottom: 20px; }
-    .controls-row { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 30px; }
+
+    .time-val { font-size: 68px; font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+    .phase-txt { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: var(--muted); margin-bottom: -5px; }
+
+    .ex-title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 4px; line-height: 1.2; }
+    .ex-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 15px; }
+
+    .controls-row { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
     .btn-main-play { flex: 1; height: 56px; border-radius: 18px; text-transform: uppercase; }
-    .upcoming-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-    .upcoming-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
-    .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
-    .up-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+
+    /* Список предстоящих упражнений с прокруткой */
+    .upcoming-section { 
+      border-top: 1px solid rgba(255,255,255,0.1); 
+      padding-top: 15px; 
+      display: flex; 
+      flex-direction: column;
+      flex-grow: 1;
+      overflow: hidden; /* Ограничиваем внешний контейнер */
+    }
+    .upcoming-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .upcoming-list { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      overflow-y: auto; /* Включаем прокрутку */
+      padding-right: 4px;
+      -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+    }
+    
+    /* Стилизация скроллбара */
+    .upcoming-list::-webkit-scrollbar { width: 4px; }
+    .upcoming-list::-webkit-scrollbar-track { background: transparent; }
+    .upcoming-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    .up-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); font-size: 14px; flex-shrink: 0; }
     .up-item.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
     .up-name { font-weight: 600; flex: 1; margin-right: 10px; }
     .up-sets { font-size: 11px; font-weight: 800; opacity: 0.6; }
+
     .hidden { display: none !important; }
     .badge { background: var(--accent); color: black; padding: 6px 12px; border-radius: 10px; font-size: 13px; font-weight: 800; }
   </style>
@@ -72,7 +105,10 @@
       <div class="phase-txt" id="phaseLabel">Работа</div><div class="time-val" id="timeLeft">00:45</div>
     </div>
     <div class="controls-row"><button class="btn btn-ghost btn-icon" onclick="engine.reset()">🔄</button><button class="btn btn-primary btn-main-play" id="playBtn" onclick="engine.toggle()">ПАУЗА</button><button class="btn btn-ghost btn-icon" onclick="engine.skip()">➡</button></div>
-    <div class="upcoming-section"><div class="upcoming-label">План тренировки</div><div id="upcomingList" class="upcoming-list"></div></div>
+    <div class="upcoming-section">
+      <div class="upcoming-label">План тренировки</div>
+      <div id="upcomingList" class="upcoming-list"></div>
+    </div>
   </div>
 <script>
   const WORK_TIME = 45; const REST_TIME = 90;
@@ -95,18 +131,12 @@
     toggle() {
       if (this.isRunning) { this.stop(); } else {
         if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        this.isRunning = true;
-        this.timer = setInterval(() => this.tick(), 1000);
+        this.isRunning = true; this.timer = setInterval(() => this.tick(), 1000);
         document.getElementById('playBtn').textContent = 'ПАУЗА';
-        this.primeSpeech(); // Разблокировка голоса для iOS
+        this.primeSpeech();
       }
     }
-    primeSpeech() {
-      // Пустое сообщение для разблокировки аудио-канала iOS по нажатию кнопки
-      const msg = new SpeechSynthesisUtterance(" ");
-      msg.volume = 0;
-      window.speechSynthesis.speak(msg);
-    }
+    primeSpeech() { const msg = new SpeechSynthesisUtterance(" "); msg.volume = 0; window.speechSynthesis.speak(msg); }
     stop() { this.isRunning = false; clearInterval(this.timer); document.getElementById('playBtn').textContent = 'ПУСК'; }
     reset() { this.timeLeft = this.phase === 'work' ? WORK_TIME : (this.phase === 'prepare' ? 5 : REST_TIME); this.updateUI(); }
     skip() { this.nextPhase(); }
@@ -119,8 +149,7 @@
       this.updateUI();
     }
     nextPhase() {
-      const currentEx = this.workout.ex[this.exIdx];
-      this.currentStep++;
+      const currentEx = this.workout.ex[this.exIdx]; this.currentStep++;
       if (this.phase === 'prepare' || this.phase === 'rest') {
         this.phase = 'work'; this.timeLeft = WORK_TIME;
         this.speak(`${currentEx.name}. Подход ${this.setIdx} из ${currentEx.sets}`);
@@ -151,7 +180,8 @@
     }
     renderUpcoming() {
       const container = document.getElementById('upcomingList'); container.innerHTML = '';
-      for (let i = this.exIdx; i < Math.min(this.exIdx + 3, this.workout.ex.length); i++) {
+      // ТЕПЕРЬ ЦИКЛ ИДЕТ ДО КОНЦА МАССИВА УПРАЖНЕНИЙ
+      for (let i = this.exIdx; i < this.workout.ex.length; i++) {
         const ex = this.workout.ex[i]; const item = document.createElement('div');
         item.className = `up-item ${i === this.exIdx ? 'active' : ''}`;
         let setsText = (i === this.exIdx) ? `Осталось: ${ex.sets - this.setIdx + 1}` : `${ex.sets} подходов`;
@@ -168,9 +198,7 @@
     speak(text) {
       if (!window.speechSynthesis) return;
       const msg = new SpeechSynthesisUtterance(text);
-      msg.lang = 'ru-RU';
-      msg.rate = 1.0;
-      // Находим русский голос в системе для iOS
+      msg.lang = 'ru-RU'; msg.rate = 1.0;
       const voices = window.speechSynthesis.getVoices();
       const ruVoice = voices.find(v => v.lang.includes('ru'));
       if (ruVoice) msg.voice = ruVoice;
