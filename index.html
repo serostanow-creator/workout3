@@ -3,26 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fit Timer Pro v2.3</title>
+  <title>Fit Timer Pro v2.4 iOS Fix</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root {
-      --bg: #05080f;
-      --card: rgba(255, 255, 255, 0.04);
-      --accent: #0ea5e9;
-      --work: #10b981;
-      --rest: #3b82f6;
-      --text: #ffffff;
-      --muted: #94a3b8;
+      --bg: #05080f; --card: rgba(255, 255, 255, 0.04); --accent: #0ea5e9;
+      --work: #10b981; --rest: #3b82f6; --text: #ffffff; --muted: #94a3b8;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at top right, #1e293b, var(--bg));
+      background-color: var(--bg); background-image: radial-gradient(circle at top right, #1e293b, var(--bg));
       color: var(--text); min-height: 100vh; transition: background-color 0.8s ease;
     }
     body.phase-work { background-color: #061a14; background-image: radial-gradient(circle at top right, #064e3b, #061a14); }
@@ -67,16 +61,12 @@
 <body id="body">
   <div class="overall-progress"><div class="progress-fill" id="totalBar"></div></div>
   <div class="container" id="mainScreen">
-    <header>
-      <h1>Тренировки</h1>
-      <div class="subtitle">Работа 45с / Отдых 90с</div>
-    </header>
+    <header><h1>Тренировки</h1><div class="subtitle">Работа 45с / Отдых 90с</div></header>
     <div id="workoutList" class="list"></div>
   </div>
   <div class="container hidden" id="runScreen">
-    <div class="top-nav"><button class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="stopWorkout()">Выход</button><div id="progressBadge" class="badge">1 / 7</div></div>
-    <div class="ex-title" id="exName">Упражнение</div>
-    <div class="ex-sub" id="setInfo">Подход 1 из 4</div>
+    <div class="top-nav"><button class="btn btn-ghost" onclick="stopWorkout()">Выход</button><div id="progressBadge" class="badge">1 / 7</div></div>
+    <div class="ex-title" id="exName">Упражнение</div><div class="ex-sub" id="setInfo">Подход 1 из 4</div>
     <div class="timer-display">
       <svg class="svg-timer" viewBox="0 0 300 300"><circle class="circle-bg" cx="150" cy="150" r="140"></circle><circle class="circle-prog" id="timerCircle" cx="150" cy="150" r="140"></circle></svg>
       <div class="phase-txt" id="phaseLabel">Работа</div><div class="time-val" id="timeLeft">00:45</div>
@@ -105,9 +95,17 @@
     toggle() {
       if (this.isRunning) { this.stop(); } else {
         if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        this.isRunning = true; this.timer = setInterval(() => this.tick(), 1000);
+        this.isRunning = true;
+        this.timer = setInterval(() => this.tick(), 1000);
         document.getElementById('playBtn').textContent = 'ПАУЗА';
+        this.primeSpeech(); // Разблокировка голоса для iOS
       }
+    }
+    primeSpeech() {
+      // Пустое сообщение для разблокировки аудио-канала iOS по нажатию кнопки
+      const msg = new SpeechSynthesisUtterance(" ");
+      msg.volume = 0;
+      window.speechSynthesis.speak(msg);
     }
     stop() { this.isRunning = false; clearInterval(this.timer); document.getElementById('playBtn').textContent = 'ПУСК'; }
     reset() { this.timeLeft = this.phase === 'work' ? WORK_TIME : (this.phase === 'prepare' ? 5 : REST_TIME); this.updateUI(); }
@@ -168,8 +166,14 @@
       osc.start(); osc.stop(this.audioCtx.currentTime + dur);
     }
     speak(text) {
-      if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
-      const msg = new SpeechSynthesisUtterance(text); msg.lang = 'ru-RU'; msg.rate = 1.0;
+      if (!window.speechSynthesis) return;
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = 'ru-RU';
+      msg.rate = 1.0;
+      // Находим русский голос в системе для iOS
+      const voices = window.speechSynthesis.getVoices();
+      const ruVoice = voices.find(v => v.lang.includes('ru'));
+      if (ruVoice) msg.voice = ruVoice;
       window.speechSynthesis.speak(msg);
     }
   }
